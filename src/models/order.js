@@ -1,10 +1,9 @@
-const dataStore = require('../data/dataStore');
-const DataModel = require('./dataModel')
-const fileStore = 'orders';
+const Framework = require('library.ecommerce.framework');
+const dataStore = new Framework.Data.FileDataStore('orders');
 
 const vatPercentage = 20.00;
 
-module.exports = class Order extends DataModel
+module.exports = class Order extends Framework.Models.DataModel
 {
     constructor(items) {
         super()
@@ -40,19 +39,19 @@ module.exports = class Order extends DataModel
     }
 
     Delete(callback) {
-        return dataStore.Delete(fileStore, this.Id, callback);
+        return dataStore.Delete(this.Id, callback);
     }
 
     Save(callback) {
-        return dataStore.Save(fileStore, this.Id, this, callback);
+        return dataStore.Save(this.Id, this, callback);
     }
 
     static FetchAll(callback) {
-        return dataStore.FetchAll(fileStore, Product.Mapper, callback);
+        return dataStore.FetchAll(Order.Mapper, callback);
     }
 
     static Fetch(id, callback) {
-        return dataStore.Fetch(fileStore, id, Product.Mapper, callback);
+        return dataStore.Fetch(id, Order.Mapper, callback);
     }
 
     static Mapper(rawJson) {
