@@ -1,6 +1,6 @@
 {
   "name": "service.orders",
-  "private" : true,
+  "private": true,
   "version": "1.0.0",
   "description": "Service for managing all order related operations",
   "main": "src/app.js",
