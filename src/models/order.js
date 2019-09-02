@@ -1,13 +1,15 @@
 const Framework = require('library.ecommerce.framework');
 const dataStore = new Framework.Data.FileDataStore('orders');
+const OrderItem = require('./orderItem');
 
 const vatPercentage = 20.00;
 
 module.exports = class Order extends Framework.Models.DataModel
 {
-    constructor(items) {
+    constructor(items, postalService) {
         super()
         this.items = [...items];
+        this.postalService = postalService;
     }
 
     get Items() {
@@ -26,12 +28,8 @@ module.exports = class Order extends Framework.Models.DataModel
         return this.postalService;
     }
 
-    set PostalService(value) {
-        return this.postalService = value;
-    }
-
     get Total() {
-        return this.SubTotal + this.VAT + this.postalService.Price;
+        return this.SubTotal + this.VAT + this.PostalService.Price;
     }
 
     get VatPercentage() {
@@ -47,17 +45,17 @@ module.exports = class Order extends Framework.Models.DataModel
     }
 
     static FetchAll(callback) {
-        return dataStore.FetchAll(Order.Mapper, callback);
+        return dataStore.FetchAll(Order.Map, callback);
     }
 
     static Fetch(id, callback) {
-        return dataStore.Fetch(id, Order.Mapper, callback);
+        return dataStore.Fetch(id, Order.Map, callback);
     }
 
-    static Mapper(rawJson) {
-        const p = JSON.parse(rawJson);
-        const product = new Product(p.name, p.description, p.price, p.imageUri);
-        product.Id = p.id;
-        return product;
+    static Map(rawJson) {
+        const orderData = JSON.parse(rawJson);
+        const order = new Order(orderData.items.map(o => new OrderItem(o.productId, o.quantity, o.pricePerItem)), orderData.postalService);
+        order.id = orderData.id;
+        return order;
     }
 }
