@@ -1,8 +1,9 @@
 const Framework = require('library.ecommerce.framework');
 const dataStore = new Framework.Data.FileDataStore('orders');
 const OrderItem = require('./orderItem');
+const vatRates = require('../data/vat');
 
-const vatPercentage = 20.00;
+const vatPercentage = vatRates[0].Rate;
 
 module.exports = class Order extends Framework.Models.DataModel
 {
@@ -33,7 +34,7 @@ module.exports = class Order extends Framework.Models.DataModel
     }
 
     get VatPercentage() {
-        return vatPercentage;
+        return vatRates[0].Rate;
     }
 
     Delete(callback) {
