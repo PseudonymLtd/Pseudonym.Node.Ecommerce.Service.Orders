@@ -73,7 +73,7 @@ module.exports = class Order extends Framework.Models.DataModel
     }
 
     Complete(callback) {
-        if (status !== CompletedState) {
+        if (this.status !== CompletedState) {
             this.status = CompletedState;
             return this.Save(callback);
         }
@@ -83,7 +83,7 @@ module.exports = class Order extends Framework.Models.DataModel
     }
 
     Abandon(callback) {
-        if (status !== AbandonedState) {
+        if (this.status !== AbandonedState) {
             this.status = AbandonedState;
             return this.Save(callback);
         }
@@ -91,7 +91,7 @@ module.exports = class Order extends Framework.Models.DataModel
     }
 
     Cancel(callback) {
-        if (status !== CancelledState) {
+        if (this.status !== CancelledState) {
             this.status = CancelledState;
             return this.Save(callback);
         }
