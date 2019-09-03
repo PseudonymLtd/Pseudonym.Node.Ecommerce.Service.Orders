@@ -1,11 +1,14 @@
 const Framework = require('library.ecommerce.framework');
 const Order = require('../models/order');
 const OrderItem = require('../models/orderItem');
+const postalServices = require('../data/shipping');
+const vatRates = require('../data/vat');
 
 module.exports = class OrdersController extends Framework.Service.Controller {
     constructor() {
         super('Orders Controller');
 
+        //lists all the orders in the system.
         this.Get('/orders', (request, response, next) => {
             Order.FetchAll((data, err) => {
                 if (err !== undefined) { return next(err); }
@@ -13,6 +16,7 @@ module.exports = class OrdersController extends Framework.Service.Controller {
             });
         });
 
+        //lists the specific order based on the id present in the path.
         this.Get('/order/:id', (request, response, next) => {
             var id = parseInt(request.params.id);
         
@@ -22,6 +26,7 @@ module.exports = class OrdersController extends Framework.Service.Controller {
             });
         });
 
+        //lists all the orders specified by the ids present in the body.
         this.Post('/orders', (request, response, next) => {
             const orderIds = request.body;
         
@@ -44,19 +49,48 @@ module.exports = class OrdersController extends Framework.Service.Controller {
             });
         });
 
+        //creates a new order
         this.Put('/order', (request, response, next) => {
-            console.log(request.body);
-            var newOrder = new Order(request.body.items.map(o => new OrderItem(o.product.id, o.quantity, o.product.price)), request.body.postalService);
+
+            const postalServiceId = parseInt(request.body.postalServiceId);
+            const postalService = postalServices.find(ps => ps.Id === postalServiceId);
+            if (!postalService) { return response.BadRequest('Could not find a postal service that matches the Id provided.', { PostalServiceId: postalServiceId }); }
+            
+            const region = request.headers.region ? request.headers.region.toUpperCase() : 'GBR';
+            const vatRate = vatRates.find(ps => ps.Region === region);
+            if (!vatRate) { return response.BadRequest('Could not find a vat rate that matches the region provided.', { Region: region }); }
+
+            var newOrder = new Order(
+                request.body.order.items.map(o => new OrderItem(o.product.id, o.product.name, o.quantity, o.product.price)),
+                postalService,
+                vatRate);
 
             newOrder.Save((data, err) => {
                 if (err !== undefined) { return next(err); }
         
-                this.Logger.info(`New order receieved:`);
+                this.Logger.info(`New order created:`);
                 console.info(newOrder);
         
                 return response.Ok(newOrder, {
                     total: newOrder.Total,
                     identifier: data.Id
+                });
+            });
+        });
+
+        //Updates the order and completes
+        this.Post('/order/:id', (request, response, next) => {
+            var id = parseInt(request.params.id);
+        
+            Order.Fetch(id, (order, err) => {
+                if (err !== undefined) { return next(err); }
+
+                order.Complete((data, err) => {
+                    if (err !== undefined) { return next(err); }
+            
+                    this.Logger.info(`Order ${data.id} ${data.status}.`);
+            
+                    return response.Ok(data);
                 });
             });
         });

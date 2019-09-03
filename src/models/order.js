@@ -1,16 +1,27 @@
 const Framework = require('library.ecommerce.framework');
 const dataStore = new Framework.Data.FileDataStore('orders');
 const OrderItem = require('./orderItem');
-const vatRates = require('../data/vat');
-
-const vatPercentage = vatRates[0].Rate;
+const PendingState = 'Pending';
+const AbandonedState = 'Abandoned';
+const CancelledState = 'Cancelled';
+const CompletedState = 'Completed';
 
 module.exports = class Order extends Framework.Models.DataModel
 {
-    constructor(items, postalService) {
+    constructor(items, postalService, vatInfo) {
         super()
         this.items = [...items];
         this.postalService = postalService;
+        this.vatInfo = vatInfo;
+        this.status = PendingState;
+    }
+
+    get Status() {
+        return this.status;
+    }
+
+    set Status(value) {
+        return this.status = value;
     }
 
     get Items() {
@@ -22,7 +33,7 @@ module.exports = class Order extends Framework.Models.DataModel
     }
 
     get VAT() {
-        return this.SubTotal * (vatPercentage / 100);
+        return this.SubTotal * (this.vatInfo.Rate / 100);
     }
 
     get PostalService() {
@@ -33,8 +44,8 @@ module.exports = class Order extends Framework.Models.DataModel
         return this.SubTotal + this.VAT + this.PostalService.Price;
     }
 
-    get VatPercentage() {
-        return vatRates[0].Rate;
+    get VatInfo() {
+        return this.vatInfo;
     }
 
     Delete(callback) {
@@ -55,8 +66,35 @@ module.exports = class Order extends Framework.Models.DataModel
 
     static Map(rawJson) {
         const orderData = JSON.parse(rawJson);
-        const order = new Order(orderData.items.map(o => new OrderItem(o.productId, o.quantity, o.pricePerItem)), orderData.postalService);
+        const order = new Order(orderData.items.map(o => new OrderItem(o.productId, o.productName, o.quantity, o.pricePerItem)), orderData.postalService, orderData.vatInfo);
         order.id = orderData.id;
+        order.status = orderData.status;
         return order;
+    }
+
+    Complete(callback) {
+        if (status !== CompletedState) {
+            this.status = CompletedState;
+            return this.Save(callback);
+        }
+        else {
+            return callback(this, 'Order has already been completed.');
+        }
+    }
+
+    Abandon(callback) {
+        if (status !== AbandonedState) {
+            this.status = AbandonedState;
+            return this.Save(callback);
+        }
+        return callback(this);
+    }
+
+    Cancel(callback) {
+        if (status !== CancelledState) {
+            this.status = CancelledState;
+            return this.Save(callback);
+        }
+        return callback(this);
     }
 }
