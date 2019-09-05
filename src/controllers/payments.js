@@ -1,4 +1,4 @@
-const Framework = require('library.ecommerce.framework');
+const Framework = require('pseudonym.node.ecommerce.library.framework');
 const vatRates = require('../data/vat');
 
 module.exports = class PaymentsController extends Framework.Service.Controller {

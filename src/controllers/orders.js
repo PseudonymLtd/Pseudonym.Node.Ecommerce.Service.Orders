@@ -1,4 +1,4 @@
-const Framework = require('library.ecommerce.framework');
+const Framework = require('pseudonym.node.ecommerce.library.framework');
 const Order = require('../models/order');
 const OrderItem = require('../models/orderItem');
 const postalServices = require('../data/shipping');

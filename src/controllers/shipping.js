@@ -1,4 +1,4 @@
-const Framework = require('library.ecommerce.framework');
+const Framework = require('pseudonym.node.ecommerce.library.framework');
 const postalServices = require('../data/shipping');
 
 module.exports = class ShippingController extends Framework.Service.Controller {

@@ -1,4 +1,4 @@
-const Framework = require('library.ecommerce.framework');
+const Framework = require('pseudonym.node.ecommerce.library.framework');
 const dataStore = new Framework.Data.FileDataStore('orders');
 const OrderItem = require('./orderItem');
 const PendingState = 'Pending';

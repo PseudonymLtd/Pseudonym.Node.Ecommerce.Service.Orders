@@ -1,4 +1,4 @@
-const Framework = require('library.ecommerce.framework');
+const Framework = require('pseudonym.node.ecommerce.library.framework');
 const OrdersController = require('./controllers/orders');
 const PaymentsController = require('./controllers/payments');
 const ShippingController = require('./controllers/shipping');
