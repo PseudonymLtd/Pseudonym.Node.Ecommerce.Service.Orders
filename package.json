@@ -1,7 +1,6 @@
 {
-  "name": "service.orders",
-  "private": true,
-  "version": "1.0.0",
+  "name": "pseudonym.node.ecommerce.service.orders",
+  "version": "1.0.0-alpha",
   "description": "Service for managing all order related operations",
   "main": "src/app.js",
   "scripts": {
@@ -11,18 +10,20 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/PseudonymLtd/Service.Ecommerce.Orders.git"
+    "url": "git+https://github.com/PseudonymLtd/Pseudonym.Node.Ecommerce.Service.Orders.git"
   },
   "keywords": [
     "microservice",
-    "orders"
+    "orders",
+    "pseudonym",
+    "ecommerce"
   ],
   "author": "Tom Day",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/PseudonymLtd/Service.Ecommerce.Orders/issues"
+    "url": "https://github.com/PseudonymLtd/Pseudonym.Node.Ecommerce.Service.Orders/issues"
   },
-  "homepage": "https://github.com/PseudonymLtd/Service.Ecommerce.Orders#readme",
+  "homepage": "https://github.com/PseudonymLtd/Pseudonym.Node.Ecommerce.Service.Orders#readme",
   "devDependencies": {
     "nodemon": "^1.19.1"
   },
