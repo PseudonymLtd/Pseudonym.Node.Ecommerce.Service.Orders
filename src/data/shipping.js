@@ -1,3 +1,5 @@
+//MOCK DATABASE, will be replaced.
+
 module.exports = [
     {
         Id: 1,
