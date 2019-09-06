@@ -50,7 +50,7 @@ module.exports = class OrdersController extends Framework.Service.Controller {
         });
 
         //creates a new order
-        this.Put('/order', (request, response, next) => {
+        this.Post('/order', (request, response, next) => {
 
             const postalServiceId = parseInt(request.body.postalServiceId);
             const postalService = postalServices.find(ps => ps.Id === postalServiceId);
@@ -78,19 +78,48 @@ module.exports = class OrdersController extends Framework.Service.Controller {
             });
         });
 
-        //Updates the order and completes
-        this.Post('/order/:id', (request, response, next) => {
+        //Updates the order
+        this.Put('/order/:id', (request, response, next) => {
             var id = parseInt(request.params.id);
         
             Order.Fetch(id, (order, err) => {
                 if (err !== undefined) { return next(err); }
 
-                order.Complete((data, err) => {
+                order.Status = request.body.status;
+
+                order.Save((data, err) => {
                     if (err !== undefined) { return next(err); }
             
-                    this.Logger.info(`Order ${data.id} ${data.status}.`);
+                    this.Logger.info('updated order:');
+                    console.info(data);
             
                     return response.Ok(data);
+                });
+            });
+        });
+
+        //deletes and order
+        this.Delete('/order/:id', (request, response, next) => {
+            var id = parseInt(request.params.id);
+        
+            Order.Fetch(id, (order, err) => {
+                if (err !== undefined) { return next(err); }
+                
+                order.Delete((existed, err) => {
+                    if (err !== undefined && existed) { 
+                        return next(err); 
+                    }
+                    else if (!existed) {
+                        return response.Partial(order, {
+                            UnexpectedBehaviour: `Record with Id ${request.params.id} has already been deleted, or never existed.`
+                        });
+                    }
+                    else {
+                        this.Logger.info(`removed order:`);
+                        console.info(order);
+        
+                        return response.Ok(order);
+                    }
                 });
             });
         });
