@@ -5,7 +5,9 @@
   "main": "src/app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "bash ./build/start.sh"
+    "start": "bash ./build/start.sh",
+    "scaffold": "bash ./build/scaffold.sh",
+    "pub": "bash ./build/publish.sh"
   },
   "repository": {
     "type": "git",
