@@ -2,7 +2,6 @@ const Framework = require('pseudonym.node.ecommerce.library.framework');
 const Order = require('../models/order');
 const OrderItem = require('../models/orderItem');
 const postalServices = require('../data/shipping');
-const vatRates = require('../data/vat');
 
 module.exports = class OrdersController extends Framework.Service.Controller {
     constructor() {
@@ -57,24 +56,31 @@ module.exports = class OrdersController extends Framework.Service.Controller {
             if (!postalService) { return response.BadRequest('Could not find a postal service that matches the Id provided.', { PostalServiceId: postalServiceId }); }
             
             const region = request.headers.region ? request.headers.region.toUpperCase() : 'GBR';
-            const vatRate = vatRates.find(ps => ps.Region === region);
-            if (!vatRate) { return response.BadRequest('Could not find a vat rate that matches the region provided.', { Region: region }); }
+            request.Service.configurationManager.ReadValue('VatInfo', (vatRates, err) => {
+                if (err) {
+                    return next(err);
+                }
+                else {
+                    const vatRate = vatRates.find(ps => ps.Region === region);
+                    if (!vatRate) { return response.BadRequest('Could not find a vat rate that matches the region provided.', { Region: region }); }
 
-            var newOrder = new Order(
-                request.body.order.items.map(o => new OrderItem(o.product.id, o.product.name, o.quantity, o.product.price)),
-                postalService,
-                vatRate);
+                    var newOrder = new Order(
+                        request.body.order.items.map(o => new OrderItem(o.product.id, o.product.name, o.quantity, o.product.price)),
+                        postalService,
+                        vatRate);
 
-            newOrder.Save((data, err) => {
-                if (err !== undefined) { return next(err); }
-        
-                this.Logger.info(`New order created:`);
-                console.info(newOrder);
-        
-                return response.Ok(newOrder, {
-                    total: newOrder.Total,
-                    identifier: data.Id
-                });
+                    newOrder.Save((data, err) => {
+                        if (err !== undefined) { return next(err); }
+                
+                        this.Logger.info(`New order created:`);
+                        console.info(newOrder);
+                
+                        return response.Ok(newOrder, {
+                            total: newOrder.Total,
+                            identifier: data.Id
+                        });
+                    });
+                }
             });
         });
 
