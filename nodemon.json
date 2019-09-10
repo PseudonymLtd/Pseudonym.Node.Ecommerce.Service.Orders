@@ -1,4 +1,4 @@
 {
     "verbose": false,
-    "ignore": ["data/**/*.json"]
+    "ignore": ["src/data/orders/*"]
 }
