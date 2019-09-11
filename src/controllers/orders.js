@@ -56,7 +56,7 @@ module.exports = class OrdersController extends Framework.Service.Controller {
             if (!postalService) { return response.BadRequest('Could not find a postal service that matches the Id provided.', { PostalServiceId: postalServiceId }); }
             
             const region = request.headers.region ? request.headers.region.toUpperCase() : 'GBR';
-            request.Service.configurationManager.ReadValue('VatInfo', (vatRates, err) => {
+            request.Environment.ConfigurationManager.ReadValue('VatInfo', (vatRates, err) => {
                 if (err) {
                     return next(err);
                 }
@@ -72,7 +72,7 @@ module.exports = class OrdersController extends Framework.Service.Controller {
                     newOrder.Save((data, err) => {
                         if (err !== undefined) { return next(err); }
                 
-                        this.Logger.info(`New order created:`);
+                        this.Logger.Info(`New order created:`);
                         console.info(newOrder);
                 
                         return response.Ok(newOrder, {
@@ -96,7 +96,7 @@ module.exports = class OrdersController extends Framework.Service.Controller {
                 order.Save((data, err) => {
                     if (err !== undefined) { return next(err); }
             
-                    this.Logger.info('updated order:');
+                    this.Logger.Info('updated order:');
                     console.info(data);
             
                     return response.Ok(data);
@@ -121,7 +121,7 @@ module.exports = class OrdersController extends Framework.Service.Controller {
                         });
                     }
                     else {
-                        this.Logger.info(`removed order:`);
+                        this.Logger.Info(`removed order:`);
                         console.info(order);
         
                         return response.Ok(order);

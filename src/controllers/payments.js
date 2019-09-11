@@ -5,7 +5,7 @@ module.exports = class PaymentsController extends Framework.Service.Controller {
         super('Payments Controller');
 
         this.Get('/Vat', (request, response, next) => {
-            request.Service.configurationManager.ReadValue('VatInfo', (data, err) => {
+            request.Environment.ConfigurationManager.ReadValue('VatInfo', (data, err) => {
                 if (err) {
                     return next(err);
                 }

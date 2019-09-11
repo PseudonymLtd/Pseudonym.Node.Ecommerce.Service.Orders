@@ -15,13 +15,13 @@ serviceRunner.RegisterController('/api', new PaymentsController());
 serviceRunner.RegisterController('/api', new OrdersController());
 
 serviceRunner.RegisterPostProcessor((request, response, complete) => {
-    return request.app.authenticator.Logout(request, err => {
+    return request.Environment.Authenticator.Logout(request, err => {
         if (err) {
-            request.app.logger.warn(`Error destroying session: ${err.toString()}`);
+            request.Environment.Logger.Warn(`Error destroying session: ${err.toString()}`);
             return complete(err);
         }
         else {
-            request.app.logger.info('Session Destroyed');
+            request.Environment.Logger.Info('Session Destroyed');
             return complete();
         }
     })
