@@ -1,6 +1,7 @@
 const Framework = require('pseudonym.node.ecommerce.library.framework');
-const dataStore = new Framework.Data.FileDataStore('orders');
 const OrderItem = require('./orderItem');
+const collectionName = 'Orders';
+
 const PendingState = 'Pending';
 const AbandonedState = 'Abandoned';
 const CancelledState = 'Cancelled';
@@ -8,93 +9,76 @@ const CompletedState = 'Completed';
 
 module.exports = class Order extends Framework.Models.DataModel
 {
-    constructor(items, postalService, vatInfo) {
-        super()
-        this.items = [...items];
-        this.postalService = postalService;
-        this.vatInfo = vatInfo;
-        this.status = PendingState;
+    constructor(items, shipping, vatInfo, status, id) {
+        super(id)
+        this._items = [...items];
+        this._shipping = shipping;
+        this._vatInfo = vatInfo;
+        this._status = status ? status : PendingState;
     }
 
     get Status() {
-        return this.status;
+        return this._status;
     }
 
     set Status(value) {
-        return this.status = value;
+        return this._status = value;
     }
 
     get Items() {
-        return this.items;
+        return this._items;
     }
 
     get SubTotal() {
-        return this.IsEmpty ? 0 : this.items.map(p => p.Total).reduce((t, p) => t + p);
+        return this.IsEmpty ? 0 : this._items.map(p => p.Total).reduce((t, p) => t + p);
     }
 
     get VAT() {
-        return this.SubTotal * (this.vatInfo.Rate / 100);
+        return this.SubTotal * (this._vatInfo.Rate / 100);
     }
 
-    get PostalService() {
-        return this.postalService;
+    get Shipping() {
+        return this._shipping;
     }
 
     get Total() {
-        return this.SubTotal + this.VAT + this.PostalService.Price;
+        return this.SubTotal + this.VAT + this.Shipping.Price;
     }
 
     get VatInfo() {
-        return this.vatInfo;
+        return this._vatInfo;
     }
 
-    Delete(callback) {
-        return dataStore.Delete(this.Id, callback);
+    static Map(dataObj) {
+        return new Order(
+            dataObj._items.map(o => new OrderItem(o._productId, o._productName, o._quantity, o._pricePerItem)),
+            dataObj._shipping,
+            dataObj._vatInfo,
+            dataObj._status,
+            dataObj._id.toString());
     }
 
-    Save(callback) {
-        return dataStore.Save(this.Id, this, callback);
+    static get CollectionName() {
+        return collectionName;
     }
 
-    static FetchAll(callback) {
-        return dataStore.FetchAll(Order.Map, callback);
+    get CollectionName() {
+        return collectionName;
     }
 
-    static Fetch(id, callback) {
-        return dataStore.Fetch(id, Order.Map, callback);
+    static get PendingState() {
+        return PendingState;
     }
 
-    static Map(rawJson) {
-        const orderData = JSON.parse(rawJson);
-        const order = new Order(orderData.items.map(o => new OrderItem(o.productId, o.productName, o.quantity, o.pricePerItem)), orderData.postalService, orderData.vatInfo);
-        order.id = orderData.id;
-        order.status = orderData.status;
-        return order;
+    static get AbandonedState() {
+        return AbandonedState;
     }
 
-    Complete(callback) {
-        if (this.status !== CompletedState) {
-            this.status = CompletedState;
-            return this.Save(callback);
-        }
-        else {
-            return callback(this, 'Order has already been completed.');
-        }
+    static get CancelledState() {
+        return CancelledState;
     }
 
-    Abandon(callback) {
-        if (this.status !== AbandonedState) {
-            this.status = AbandonedState;
-            return this.Save(callback);
-        }
-        return callback(this);
-    }
-
-    Cancel(callback) {
-        if (this.status !== CancelledState) {
-            this.status = CancelledState;
-            return this.Save(callback);
-        }
-        return callback(this);
+    static get CompletedState() {
+        return CompletedState;
     }
 }

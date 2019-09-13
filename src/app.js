@@ -8,7 +8,7 @@ const serviceRunner = new Framework.Service.Runner('Orders Service');
 
 serviceRunner.RegisterInfoHealthCheck(new Framework.Service.FileSystemAccessHealthCheck([
     __dirname,
-    path.join(__dirname, 'data', 'orders')
+    path.join(__dirname, '..', 'appsettings.json')
 ]));
 
 serviceRunner.RegisterController('/api', new PaymentsController());

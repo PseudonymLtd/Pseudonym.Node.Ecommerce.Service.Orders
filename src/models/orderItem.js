@@ -1,26 +1,26 @@
 module.exports = class OrderItem
 {
     constructor(productId, productName, quantity, pricePerItem) {
-        this.productId = parseInt(productId);
-        this.productName = productName;
-        this.quantity = parseInt(quantity);
-        this.pricePerItem = parseFloat(pricePerItem);
+        this._productId = productId;
+        this._productName = productName;
+        this._quantity = parseInt(quantity);
+        this._pricePerItem = parseFloat(pricePerItem);
     }
 
     get ProductId() {
-        return this.productId;
+        return this._productId;
     }
 
     get ProductName() {
-        return this.productName;
+        return this._productName;
     }
 
     get Quantity() {
-        return this.quantity;
+        return this._quantity;
     }
 
     get PricePerItem() {
-        return this.pricePerItem;
+        return this._pricePerItem;
     }
 
     get Total() {
