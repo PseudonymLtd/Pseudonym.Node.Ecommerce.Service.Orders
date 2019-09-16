@@ -22,4 +22,11 @@ serviceRunner.RegisterPostProcessor((request, response, complete) => {
     })
 });
 
-serviceRunner.Start(3002);
+serviceRunner.UseConfiguredLogin((err) => {
+    if (err) {
+        throw err;
+    }
+    else {
+        return serviceRunner.Start(3002);
+    }
+});
