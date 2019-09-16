@@ -44,7 +44,7 @@ module.exports = class OrdersController extends Framework.Service.Controller {
                 return response.BadRequest('Body did not contain any order Ids.');
             }
             
-            Order.FetchByIds((orders, err) => {
+            Order.FetchByIds(orderIds, (orders, err) => {
                 if (err !== undefined) { return next(err); }
         
                 const unfoundIds = orderIds.filter(id => !orders.map(p => p.Id).includes(id));
